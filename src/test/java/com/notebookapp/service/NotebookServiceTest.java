@@ -14,10 +14,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.notebookapp.NotebookTestUtils;
 import com.notebookapp.dto.NoteDto;
 import com.notebookapp.dto.NotebookDto;
-import com.notebookapp.exception.NotFoundCustomException;
 import com.notebookapp.exception.ExceptionMessageType;
+import com.notebookapp.exception.NotFoundCustomException;
 import com.notebookapp.mapper.NotebookMapper;
 import com.notebookapp.model.Note;
 import com.notebookapp.model.Notebook;
@@ -39,7 +40,7 @@ class NotebookServiceTest {
 	@Test
 	public void createNotebook() {
 		// given
-		NotebookDto notebookDto = new NotebookDto("id", "new_title", null, null, null);
+		NotebookDto notebookDto = NotebookTestUtils.createNotebookDtoWithoutNotes();
 		when(notebookRepository.save(any(Notebook.class))).thenReturn(NotebookMapper.MAPPER.convert(notebookDto));
 
 		// when
@@ -53,9 +54,9 @@ class NotebookServiceTest {
 	@Test
 	public void updateNotebook() throws NotFoundCustomException {
 		// given
-		NotebookDto notebookDto = new NotebookDto("id", "new_title", null, null, null);
-		Notebook notebookFromDb = new Notebook("id", "previous_title", null, null, null);
-		when(notebookRepository.findById(any(String.class))).thenReturn(Optional.of(notebookFromDb));
+		NotebookDto notebookDto = NotebookTestUtils.createNotebookDtoWithoutNotes();
+		when(notebookRepository.findById(any(String.class)))
+				.thenReturn(Optional.of(NotebookTestUtils.createNotebookWithoutNotes()));
 		when(notebookRepository.save(any(Notebook.class))).thenReturn(NotebookMapper.MAPPER.convert(notebookDto));
 
 		// when
@@ -67,23 +68,17 @@ class NotebookServiceTest {
 		Assertions.assertThat(updated.title()).isEqualTo(notebookDto.title());
 	}
 
-	// @Test
-	// public void updateNotebookThrowIllegalArgumentError() throws CustomException {
-	// 	Assertions.assertThatThrownBy(() -> notebookService.update(null))
-    //             .hasMessage(ExceptionMessageType.ILLEGAL_ARGUMENT);
-	// }
-
 	@Test
 	public void updateNotebookThrowNotFoundError() throws NotFoundCustomException {
-		NotebookDto notebookDto = new NotebookDto("id", "new_title", null, null, null);
+		NotebookDto notebookDto = NotebookTestUtils.createNotebookDtoWithoutNotes();
 		Assertions.assertThatThrownBy(() -> notebookService.update(notebookDto))
-                .hasMessage(ExceptionMessageType.NOTEBOOK_NOT_FOUND);
+				.hasMessage(ExceptionMessageType.NOTEBOOK_NOT_FOUND);
 	}
 
 	@Test
 	public void deleteNotebook() {
 		// given
-		Notebook notebookFromDb = new Notebook("id", "old_title", null, null, null);
+		Notebook notebookFromDb = NotebookTestUtils.createNotebookWithoutNotes();
 		when(notebookRepository.findById(any(String.class))).thenReturn(Optional.of(notebookFromDb));
 
 		// when
@@ -96,7 +91,7 @@ class NotebookServiceTest {
 	@Test
 	public void getNotebooks() {
 		// given
-		when(notebookRepository.findAll()).thenReturn(List.of(new Notebook()));
+		when(notebookRepository.findAll()).thenReturn(List.of(NotebookTestUtils.createNotebookWithoutNotes()));
 
 		// when
 		List<NotebookDto> notebooks = notebookService.getNoteboks();
@@ -109,8 +104,7 @@ class NotebookServiceTest {
 	@Test
 	public void getNoteById() throws NotFoundCustomException {
 		// given
-		Note note = new Note();
-		note.setId("note_id");
+		Note note = NotebookTestUtils.createNote();
 		when(noteRepository.findById(any(String.class))).thenReturn(Optional.of(note));
 
 		// when
@@ -124,32 +118,32 @@ class NotebookServiceTest {
 	@Test
 	public void getNoteByIdThrowError() {
 		Assertions.assertThatThrownBy(() -> notebookService.getNoteById(any(String.class)))
-                .hasMessage(ExceptionMessageType.NOTE_NOT_FOUND);
+				.hasMessage(ExceptionMessageType.NOTE_NOT_FOUND);
 	}
 
 	@Test
 	public void addNoteToNotebook() throws NotFoundCustomException {
 		// given
-		Notebook notebook = new Notebook();
-		Note note = new Note();
+		Notebook notebook = NotebookTestUtils.createNotebookWithNotes();
 		when(notebookRepository.findById(any(String.class))).thenReturn(Optional.of(notebook));
-		when(noteRepository.save(any(Note.class))).thenReturn(note);
+		when(noteRepository.save(any(Note.class))).thenReturn(NotebookTestUtils.createNote());
 
 		// when
-		NoteDto noteDto = notebookService.addNote(anyString(), new NoteDto("note_id", "new_title", null, null, null));
+		NoteDto noteDto = notebookService.addNote(anyString(), NotebookTestUtils.createNoteDto());
 
 		// then
 		Mockito.verify(notebookRepository).findById(any(String.class));
 		Mockito.verify(notebookRepository).save(any(Notebook.class));
 		Mockito.verify(noteRepository).save(any(Note.class));
 		Assertions.assertThat(noteDto).isNotNull();
-		Assertions.assertThat(notebook.getNotes()).hasSize(1);
+		Assertions.assertThat(notebook.getNotes()).isNotEmpty();
+		Assertions.assertThat(notebook.getNotes()).hasSize(3);
 	}
 
 	@Test
 	public void addNoteThrowError() {
 		Assertions.assertThatThrownBy(() -> notebookService.addNote(null, any(NoteDto.class)))
-                .hasMessage(ExceptionMessageType.NOTEBOOK_NOT_FOUND);
-	} 
+				.hasMessage(ExceptionMessageType.NOTEBOOK_NOT_FOUND);
+	}
 
 }

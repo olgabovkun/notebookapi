@@ -3,20 +3,16 @@ package com.notebookapp.dto;
 import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
-public record NoteDto (
+public record NoteDto(
+        String id,
 
-    String id,
+        @NotBlank(message = "Note title cannot be empty") 
+        String title,
+        
+        String content,
 
-    @NotNull(message = "Note title cannot be null")
-    @NotBlank(message = "Note title cannot be empty")
-    String title,
+        LocalDateTime createdAt,
 
-    String content,
-
-    LocalDateTime createdAt,
-
-    LocalDateTime updatedAt
-    
-) {}
+        LocalDateTime updatedAt) {
+}

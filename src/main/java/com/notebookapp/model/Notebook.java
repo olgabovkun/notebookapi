@@ -27,15 +27,15 @@ public class Notebook {
     private String id;
 
     private String title;
+
+    @DocumentReference
+    private List<Note> notes = new ArrayList<>();
     
     @CreatedDate
     private LocalDateTime createdAt;
     
     @LastModifiedDate
     private LocalDateTime updatedAt;
-    
-    @DocumentReference
-    private List<Note> notes = new ArrayList<>();
 
     @Override 
     public String toString() {

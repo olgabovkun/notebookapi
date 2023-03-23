@@ -1,8 +1,6 @@
 package com.notebookapp.dto;
 
-public record ShortNoteDto (
-
-    String id,
-    String title
-    
-) {}
+public record ShortNoteDto(
+        String id,
+        String title) {
+}
