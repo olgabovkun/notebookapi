@@ -41,10 +41,9 @@ public class NotebookControllerTest {
     public void getNoteboks() throws Exception {
         // given
         List<NotebookDto> notebookDtos = NotebookTestUtils.createNotebookDtoListWithoutNotes();
-
-        // when
         Mockito.when(notebookService.getNoteboks()).thenReturn(Lists.newArrayList(notebookDtos));
 
+        // when
         mockMvc.perform(MockMvcRequestBuilders.get("/api/notebook"))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -56,10 +55,9 @@ public class NotebookControllerTest {
     public void createNotebook() throws Exception {
         // given
         NotebookDto notebookDto = NotebookTestUtils.createNotebookDtoWithoutNotes();
-
-        // when
         Mockito.when(notebookService.create(notebookDto)).thenReturn(notebookDto);
 
+        // when
         mockMvc.perform(MockMvcRequestBuilders.post(
                 "/api/notebook/create").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(notebookDto)))
@@ -81,10 +79,9 @@ public class NotebookControllerTest {
     public void updateNotebook() throws Exception {
         // given
         NotebookDto notebookDto = NotebookTestUtils.createNotebookDtoWithoutNotes();
-
-        // when
         Mockito.when(notebookService.update(notebookDto)).thenReturn(notebookDto);
 
+        // when
         mockMvc.perform(MockMvcRequestBuilders.put(
                 "/api/notebook/update").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(notebookDto)))
@@ -114,10 +111,9 @@ public class NotebookControllerTest {
     public void addNote() throws Exception {
         // given
         NoteDto noteDto = NotebookTestUtils.createNoteDto();
-
-        // when
         Mockito.when(notebookService.addNote("notebook_id", noteDto)).thenReturn(noteDto);
-
+        
+        // when
         mockMvc.perform(MockMvcRequestBuilders.post(String.format("/api/notebook/%s/add-note", "notebook_id"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(noteDto)))
@@ -130,10 +126,9 @@ public class NotebookControllerTest {
     public void addNoteValidationError(String title) throws Exception {
         // given
         NoteDto noteDto = NotebookTestUtils.createNoteDto("note_id", title);
-
-        // when
         Mockito.when(notebookService.addNote("notebook_id", noteDto)).thenReturn(noteDto);
 
+        // when
         mockMvc.perform(MockMvcRequestBuilders.post(String.format("/api/notebook/%s/add-note", "notebook_id"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(noteDto)))

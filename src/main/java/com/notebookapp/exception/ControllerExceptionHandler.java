@@ -13,7 +13,6 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.notebookapp.dto.CustomErrorDto;
 
-// todo(bovkun): test
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
