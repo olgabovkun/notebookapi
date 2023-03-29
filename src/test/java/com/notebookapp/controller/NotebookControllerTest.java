@@ -13,6 +13,8 @@ import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataM
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -26,6 +28,7 @@ import com.notebookapp.service.NotebookService;
 
 @AutoConfigureDataMongo
 @WebMvcTest(NotebookController.class)
+@WithMockUser(username = "test_01", roles = "USER")
 public class NotebookControllerTest {
 
     @MockBean
@@ -59,7 +62,9 @@ public class NotebookControllerTest {
 
         // when
         mockMvc.perform(MockMvcRequestBuilders.post(
-                "/api/notebook/create").contentType(MediaType.APPLICATION_JSON)
+                "/api/notebook/create")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(notebookDto)))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -69,7 +74,9 @@ public class NotebookControllerTest {
     @NullAndEmptySource
     public void createNotebookValidationError(String title) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(
-                "/api/notebook/create").contentType(MediaType.APPLICATION_JSON)
+                "/api/notebook/create")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(NotebookTestUtils.createNotebookDtoWithoutNotes("id", title))))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -83,7 +90,9 @@ public class NotebookControllerTest {
 
         // when
         mockMvc.perform(MockMvcRequestBuilders.put(
-                "/api/notebook/update").contentType(MediaType.APPLICATION_JSON)
+                "/api/notebook/update")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(notebookDto)))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -93,7 +102,9 @@ public class NotebookControllerTest {
     @NullAndEmptySource
     public void updateNotebookValidationError(String title) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put(
-                "/api/notebook/update").contentType(MediaType.APPLICATION_JSON)
+                "/api/notebook/update")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(NotebookTestUtils.createNotebookDtoWithoutNotes("id", title))))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -101,20 +112,21 @@ public class NotebookControllerTest {
 
     @Test
     public void deleteNotebook() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete(String.format("/api/notebook/%s", "id")))
+        mockMvc.perform(MockMvcRequestBuilders.delete(String.format("/api/notebook/%s", "id"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
-
 
     @Test
     public void addNote() throws Exception {
         // given
         NoteDto noteDto = NotebookTestUtils.createNoteDto();
         Mockito.when(notebookService.addNote("notebook_id", noteDto)).thenReturn(noteDto);
-        
+
         // when
         mockMvc.perform(MockMvcRequestBuilders.post(String.format("/api/notebook/%s/add-note", "notebook_id"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(noteDto)))
                 .andDo(MockMvcResultHandlers.print())
@@ -130,6 +142,7 @@ public class NotebookControllerTest {
 
         // when
         mockMvc.perform(MockMvcRequestBuilders.post(String.format("/api/notebook/%s/add-note", "notebook_id"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(noteDto)))
                 .andDo(MockMvcResultHandlers.print())
@@ -138,7 +151,8 @@ public class NotebookControllerTest {
 
     @Test
     public void getNoteById() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/api/notebook/note/%s", "note_id")))
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/api/notebook/note/%s", "note_id"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }

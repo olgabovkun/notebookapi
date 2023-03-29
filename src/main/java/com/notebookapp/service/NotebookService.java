@@ -35,9 +35,7 @@ public class NotebookService {
     }
 
     public NotebookDto create(NotebookDto notebookDto) {
-
         log.info("Creating new notebook");
-        log.info(notebookDto.toString());
 
         Notebook newNotebook = NotebookMapper.MAPPER.convert(notebookDto);
         Notebook createdNotebook = notebookRepository.save(newNotebook);
