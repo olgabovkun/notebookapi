@@ -119,6 +119,14 @@ public class NotebookControllerTest {
     }
 
     @Test
+    public void getNotebookById() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/api/notebook/%s", "notebook_id"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
     public void addNote() throws Exception {
         // given
         NoteDto noteDto = NotebookTestUtils.createNoteDto();

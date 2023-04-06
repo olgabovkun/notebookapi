@@ -102,6 +102,26 @@ class NotebookServiceTest {
 	}
 
 	@Test
+	public void getNotebookById() throws NotFoundCustomException {
+		// given
+		Notebook notebook = NotebookTestUtils.createNotebookWithoutNotes();
+		when(notebookRepository.findById(any(String.class))).thenReturn(Optional.of(notebook));
+
+		// when
+		NotebookDto notebookDto = notebookService.getNotebookById(notebook.getId());
+
+		// then
+		Mockito.verify(notebookRepository).findById(any(String.class));
+		Assertions.assertThat(notebookDto).isNotNull();
+	}
+
+	@Test
+	public void getNotebookByIdThrowError() {
+		Assertions.assertThatThrownBy(() -> notebookService.getNotebookById(any(String.class)))
+				.hasMessage(ExceptionMessageType.NOTEBOOK_NOT_FOUND);
+	}
+
+	@Test
 	public void getNoteById() throws NotFoundCustomException {
 		// given
 		Note note = NotebookTestUtils.createNote();

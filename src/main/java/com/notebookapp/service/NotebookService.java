@@ -67,6 +67,18 @@ public class NotebookService {
         fromDb.ifPresent(notebookRepository::delete);
     }
 
+    public NotebookDto getNotebookById(String id) throws NotFoundCustomException {
+        Optional<Notebook> fromDbOpt = notebookRepository.findById(id);
+
+        if (fromDbOpt.isEmpty()) {
+            throw NotFoundCustomException.getNotFoundException(ExceptionMessageType.NOTEBOOK_NOT_FOUND);
+        }
+
+        Notebook fromDb = fromDbOpt.get();
+
+        return NotebookMapper.MAPPER.convert(fromDb);
+    }
+
     public NoteDto addNote(String id, NoteDto nodeDto) throws NotFoundCustomException {
         log.info("Adding note to notebook {}", id);
 

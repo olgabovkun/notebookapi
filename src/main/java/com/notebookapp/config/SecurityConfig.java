@@ -32,7 +32,7 @@ public class SecurityConfig {
         http.cors().and()
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/notebook*")
+                .requestMatchers("/api*")
                 .hasRole("USER")
                 .anyRequest()
                 .authenticated();

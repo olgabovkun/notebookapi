@@ -46,6 +46,11 @@ public class NotebookController {
         notebookService.delete(id);
     }
 
+    @GetMapping("/{id}")
+    public NotebookDto getNotebookById(@PathVariable("id") String id) throws NotFoundCustomException {
+        return notebookService.getNotebookById(id);
+    }
+
     @PostMapping("/{id}/add-note")
     public NoteDto addNote(@PathVariable("id") String id, @RequestBody @Valid NoteDto noteDto)
             throws NotFoundCustomException {
